@@ -1,4 +1,4 @@
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>MeshFreeFoam API Docs – docs</title><link>https://meshfreefoam.github.io/tags/docs/</link><description>Recent content in docs on MeshFreeFoam API Docs</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sat, 19 Aug 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://meshfreefoam.github.io/tags/docs/index.xml" rel="self" type="application/rss+xml"/><item><title>Docs: Getting Started</title><link>https://meshfreefoam.github.io/docs/getting-started/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://meshfreefoam.github.io/docs/getting-started/</guid><description>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>MeshFreeFoam API Docs – docs</title><link>https://foamscience.github.io/MeshFreeFoam-Docs/tags/docs/</link><description>Recent content in docs on MeshFreeFoam API Docs</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sat, 19 Aug 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://foamscience.github.io/MeshFreeFoam-Docs/tags/docs/index.xml" rel="self" type="application/rss+xml"/><item><title>Docs: Getting Started</title><link>https://foamscience.github.io/MeshFreeFoam-Docs/docs/getting-started/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://foamscience.github.io/MeshFreeFoam-Docs/docs/getting-started/</guid><description>
 &lt;h2 id="prerequisites">Prerequisites&lt;/h2>
 &lt;ul>
 &lt;li>&lt;a href="https://github.com/FoamScience/hyde">This fork of Hyde&lt;/a>&lt;/li>
@@ -36,7 +36,7 @@ if information there needs to be changed!&lt;/p>
 or the navigation buttons at the bottom of the page.&lt;/p>
 &lt;h2 id="write-a-blog-entry">Write a blog entry&lt;/h2>
 &lt;p>Did working on this commit make you learn something new? Write a blog entry about it at&lt;br />
-&lt;code>content/en/blog&lt;/code>!&lt;/p></description></item><item><title>Docs: Example Page</title><link>https://meshfreefoam.github.io/docs/getting-started/example-page/</link><pubDate>Sat, 19 Aug 2023 00:00:00 +0000</pubDate><guid>https://meshfreefoam.github.io/docs/getting-started/example-page/</guid><description>
+&lt;code>content/en/blog&lt;/code>!&lt;/p></description></item><item><title>Docs: Example Page</title><link>https://foamscience.github.io/MeshFreeFoam-Docs/docs/getting-started/example-page/</link><pubDate>Sat, 19 Aug 2023 00:00:00 +0000</pubDate><guid>https://foamscience.github.io/MeshFreeFoam-Docs/docs/getting-started/example-page/</guid><description>
 &lt;div class="pageinfo pageinfo-primary">
 &lt;p>This is a placeholder page. Replace it with your own content.&lt;/p>
 &lt;/div>
