@@ -11,7 +11,17 @@
 <a href=https://github.com/FoamScience/MeshFreeFoam/issues/new class=td-page-meta--project-issue target=_blank rel=noopener><i class="fa-solid fa-list-check fa-fw"></i> Create project issue</a></div></aside><main class="col-12 col-md-9 col-xl-8 ps-md-5" role=main><nav aria-label=breadcrumb class=td-breadcrumbs><ol class=breadcrumb><li class=breadcrumb-item><a href=https://foamscience.github.io/MeshFreeFoam-Docs/tests/>Unit Tests</a></li><li class=breadcrumb-item><a href=https://foamscience.github.io/MeshFreeFoam-Docs/tests/meshfree/>meshfree</a></li><li class="breadcrumb-item active" aria-current=page>triSurfaceShape</li></ol></nav><div class=td-content><h1>Unit tests for <code>triSurfaceShape</code></h1><p>Tests were performed using Catch2 version
 <code class="code-inline language-cpp"><span style=color:#60e;font-weight:700>3.3.2</span></code>
 and the following filters:
-<code class="code-inline language-cpp">[<span style=color:red;background-color:#faa>#</span>triSurfaceShapeTests] [serial] [advectionDiffusion]</code></p><h2>triSurfaceShape: Constuction in 3D performs correct boundary registration - 3</h2><p>Defined in file:
+<code class="code-inline language-cpp">[<span style=color:red;background-color:#faa>#</span>triSurfaceShapeTests] [serial] [advectionDiffusion]</code></p><p><i class="fa-sharp fa-solid fa-check -text-primary"></i><span class=-text-primary>
+1 Passing</span> test cases (<span class=-text-primary>
+2</span> expressions ),
+<span class=-text-warning>0 failing</span> (<span class=-text-warning>
+0 expressions</span>
+).
+0 test cases
+were skipped (0 expressions)
+and
+0 test cases
+were expected to fail (0 expressions).</p><h2>triSurfaceShape: Constuction in 3D performs correct boundary registration - 3</h2><p>Defined in file:
 <a href=https://github.com/FoamScience/MeshFreeFoam/tree/master/tests/meshfree/triSurfaceShapeTests.C#L13>triSurfaceShapeTests.C#L13</a></p><p>With expressions:</p><hr><div><p><i class="fa fa-check -text-success"></i>
 From file <a href=https://github.com/FoamScience/MeshFreeFoam/tree/master/tests/meshfree/triSurfaceShapeTests.C#L25>triSurfaceShapeTests.C#L25</a>:<br><code class="code-inline language-cpp">CHECK ( shapePtr<span style=color:#333>-></span>boundaryNames().size() <span style=color:#333>==</span> <span style=color:#00d;font-weight:700>2</span> )</code>
 which expands to:
