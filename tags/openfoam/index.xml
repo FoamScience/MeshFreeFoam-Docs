@@ -23,7 +23,17 @@
 &lt;p>To this end, I originally crafted the &lt;a href="https://github.com/FoamScience/foamUT">foamUT&lt;/a> toolkit to unit-test OpenFOAM code in a streamlined way. All that is needed is to write by-library tests and supply the appropriate &lt;code>Make/files&lt;/code> and &lt;code>Make/options&lt;/code> files to compile them. Example tests are provided in the &lt;a href="https://github.com/FoamScience/MeshFreeFoam/tree/master/tests">MeshFreeFoam&lt;/a> repository.&lt;/p>
 &lt;p>Unit tests marvelously demonstrate usage of different code entities so I thought we would add them to the documentation website. Head to &lt;a href="https://foamscience.github.io/MeshFreeFoam-Docs/tests">tests&lt;/a> to browse all unit tests and see their latest states.&lt;/p>
 &lt;p>Currently, this feature relies on parsing Catch2 XML reports and I doubt this will change. Of course, at this point,&lt;br />
-I&amp;rsquo;m only supporting simple test case reports. I&amp;rsquo;ll expand as I go.&lt;/p></description></item><item><title>Blog: Lazy Evaluation: Part 1</title><link>https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/09/27/lazy-evaluation-part-1/</link><pubDate>Wed, 27 Sep 2023 00:00:00 +0000</pubDate><guid>https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/09/27/lazy-evaluation-part-1/</guid><description>
+I&amp;rsquo;m only supporting simple test case reports. I&amp;rsquo;ll expand as I go.&lt;/p></description></item><item><title>Blog: Optimization notes: Part 1</title><link>https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/08/29/optimization-notes-part-1/</link><pubDate>Tue, 29 Aug 2023 00:00:00 +0000</pubDate><guid>https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/08/29/optimization-notes-part-1/</guid><description>
+&lt;h2 id="kdtree-and-radius-based-searches">KdTree and radius-based searches&lt;/h2>
+&lt;p>After sweeping the existing C++ libraries capable of doing k-nearest neighbor (KNN) search with unsorted radius queries, I have reached the conclusion of using &lt;a href="https://github.com/jlblancoc/nanoflann">nanoflann&lt;/a> as a backend for such searches.&lt;/p>
+&lt;p>Their API is nice and easy to use but with one specific caveat: The dynamic &lt;code>KdTree&lt;/code> is not trivial to use. After putting up some unit tests to the KdTree wrapper, I quickly discovered that changing the list of point positions we perform searches against is not fun. My current solution is to hash the current content of the list and check it again on each KNN search!&lt;/p>
+&lt;p>If the list of points has been radically changed, the KdTree index will be invalid; so we need to reset it. But, if the list is only being appended to (no changes to old elements), the new points are added to the index.&lt;/p>
+&lt;p>At this point, I have mainly three unanswered question:&lt;/p>
+&lt;ul>
+&lt;li>How efficient is to hash the point list?&lt;/li>
+&lt;li>How efficient OpenFOAM&amp;rsquo;s implementation of Jenkins hasher is?&lt;/li>
+&lt;li>How efficient is to reset the KdTree index (compared to remove all points and add add the new ones)?&lt;/li>
+&lt;/ul></description></item><item><title>Blog: Lazy Evaluation: Part 1</title><link>https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/09/27/lazy-evaluation-part-1/</link><pubDate>Wed, 27 Sep 2023 00:00:00 +0000</pubDate><guid>https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/09/27/lazy-evaluation-part-1/</guid><description>
 &lt;div style="position:relative;padding-bottom:56.25%;">
 &lt;iframe style="width:100%;height:100%;position:absolute;left:0px;top:0px;" frameborder="0" width="100%" height="100%" allowfullscreen="" allow="autoplay" src="./LazyEvaluationAnimation.html">
 &lt;/iframe>
@@ -59,7 +69,7 @@ I&amp;rsquo;m only supporting simple test case reports. I&amp;rsquo;ll expand as
 &lt;h2 id="lazy-evaluation-with-views">Lazy evaluation with views&lt;/h2>
 &lt;div class="alert alert-warning" role="alert">
 &lt;h4 class="alert-heading">Warning&lt;/h4>
-NVIDIA&amp;rsquo;s HC c++ compilers at the moment support only C++17; &lt;a href="https://developer.nvidia.com/blog/accelerating-standard-c-with-gpus-using-stdpar/">using stdpar&lt;/a> will prove difficult if decided to use views. So, for now, it&amp;rsquo;s either to optimize for CPU; &lt;strong>or&lt;/strong> use the GPU. We can&amp;rsquo;t do both as working comfortably with views requires C++23.
+NVIDIA&amp;rsquo;s HPC c++ compilers at the moment support only C++17; &lt;a href="https://developer.nvidia.com/blog/accelerating-standard-c-with-gpus-using-stdpar/">using stdpar&lt;/a> will prove difficult if decided to use views. So, for now, it&amp;rsquo;s either to optimize for CPU; &lt;strong>or&lt;/strong> use the GPU. We can&amp;rsquo;t do both as working comfortably with views requires C++23.
 &lt;/div>
 &lt;p>In particular, C++20 introduces &lt;code>views&lt;/code> which are special kinds of ranges which do not own their data. Think of them as views into the CFD fields. These were perfect for other purposes too, for example, implementation of fit-in-L2-cache subdomains for MeshFreeFoam.&lt;/p>
 &lt;p>The biggest problem with views is the thin compiler support. For example, to use &lt;code>zip_transform&lt;/code> which allows to do operations on multiple views at one (eg. binary functions), we have to using at least GCC 13 and link against C++23.&lt;/p>
@@ -110,14 +120,4 @@ flags: avx avx2 lm nx pae sse sse2 sse3 sse4_1 sse4_2 sse4a ssse3 svm bogomips: 
 Speed: 1254 MHz min/max: 1200/3200 MHz Core speeds (MHz): 1: 1275 2: 1191 3: 1139 4: 1227 5: 1134 6: 1135 7: 1297
 8: 1296 9: 1135 10: 1135 11: 1135 12: 1133 13: 1286 14: 1171 15: 1517 16: 1161
 &lt;/code>&lt;/pre>&lt;h2 id="conclusion">Conclusion&lt;/h2>
-&lt;p>If GPU acceleration is not important, &lt;code>Views&lt;/code> it is. This idea might fail horribly though, as everything else.&lt;/p></description></item><item><title>Blog: Optimization notes: Part 1</title><link>https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/08/29/optimization-notes-part-1/</link><pubDate>Tue, 29 Aug 2023 00:00:00 +0000</pubDate><guid>https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/08/29/optimization-notes-part-1/</guid><description>
-&lt;h2 id="kdtree-and-radius-based-searches">KdTree and radius-based searches&lt;/h2>
-&lt;p>After sweeping the existing C++ libraries capable of doing k-nearest neighbor (KNN) search with unsorted radius queries, I have reached the conclusion of using &lt;a href="https://github.com/jlblancoc/nanoflann">nanoflann&lt;/a> as a backend for such searches.&lt;/p>
-&lt;p>Their API is nice and easy to use but with one specific caveat: The dynamic &lt;code>KdTree&lt;/code> is not trivial to use. After putting up some unit tests to the KdTree wrapper, I quickly discovered that changing the list of point positions we perform searches against is not fun. My current solution is to hash the current content of the list and check it again on each KNN search!&lt;/p>
-&lt;p>If the list of points has been radically changed, the KdTree index will be invalid; so we need to reset it. But, if the list is only being appended to (no changes to old elements), the new points are added to the index.&lt;/p>
-&lt;p>At this point, I have mainly three unanswered question:&lt;/p>
-&lt;ul>
-&lt;li>How efficient is to hash the point list?&lt;/li>
-&lt;li>How efficient OpenFOAM&amp;rsquo;s implementation of Jenkins hasher is?&lt;/li>
-&lt;li>How efficient is to reset the KdTree index (compared to remove all points and add add the new ones)?&lt;/li>
-&lt;/ul></description></item></channel></rss>
+&lt;p>If GPU acceleration is not important, &lt;code>Views&lt;/code> it is. This idea might fail horribly though, as everything else.&lt;/p></description></item></channel></rss>

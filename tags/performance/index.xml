@@ -34,7 +34,7 @@
 &lt;h2 id="lazy-evaluation-with-views">Lazy evaluation with views&lt;/h2>
 &lt;div class="alert alert-warning" role="alert">
 &lt;h4 class="alert-heading">Warning&lt;/h4>
-NVIDIA&amp;rsquo;s HC c++ compilers at the moment support only C++17; &lt;a href="https://developer.nvidia.com/blog/accelerating-standard-c-with-gpus-using-stdpar/">using stdpar&lt;/a> will prove difficult if decided to use views. So, for now, it&amp;rsquo;s either to optimize for CPU; &lt;strong>or&lt;/strong> use the GPU. We can&amp;rsquo;t do both as working comfortably with views requires C++23.
+NVIDIA&amp;rsquo;s HPC c++ compilers at the moment support only C++17; &lt;a href="https://developer.nvidia.com/blog/accelerating-standard-c-with-gpus-using-stdpar/">using stdpar&lt;/a> will prove difficult if decided to use views. So, for now, it&amp;rsquo;s either to optimize for CPU; &lt;strong>or&lt;/strong> use the GPU. We can&amp;rsquo;t do both as working comfortably with views requires C++23.
 &lt;/div>
 &lt;p>In particular, C++20 introduces &lt;code>views&lt;/code> which are special kinds of ranges which do not own their data. Think of them as views into the CFD fields. These were perfect for other purposes too, for example, implementation of fit-in-L2-cache subdomains for MeshFreeFoam.&lt;/p>
 &lt;p>The biggest problem with views is the thin compiler support. For example, to use &lt;code>zip_transform&lt;/code> which allows to do operations on multiple views at one (eg. binary functions), we have to using at least GCC 13 and link against C++23.&lt;/p>
