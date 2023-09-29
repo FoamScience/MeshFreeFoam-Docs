@@ -1,15 +1,15 @@
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>MeshFreeFoam API Docs – openfoam</title><link>https://foamscience.github.io/MeshFreeFoam-Docs/tags/openfoam/</link><description>Recent content in openfoam on MeshFreeFoam API Docs</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Wed, 27 Sep 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://foamscience.github.io/MeshFreeFoam-Docs/tags/openfoam/index.xml" rel="self" type="application/rss+xml"/><item><title>Blog: Runtime selection mechanism for `MeshFreeFoam`</title><link>https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/08/28/runtime-selection-mechanism-for-meshfreefoam/</link><pubDate>Mon, 28 Aug 2023 00:00:00 +0000</pubDate><guid>https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/08/28/runtime-selection-mechanism-for-meshfreefoam/</guid><description>
-&lt;p>In short, I&amp;rsquo;ll stick with OpenFOAM&amp;rsquo;s way of doing things when it comes:&lt;/p>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>MeshFreeFoam API Docs – openfoam</title><link>https://foamscience.github.io/MeshFreeFoam-Docs/tags/openfoam/</link><description>Recent content in openfoam on MeshFreeFoam API Docs</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Fri, 29 Sep 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://foamscience.github.io/MeshFreeFoam-Docs/tags/openfoam/index.xml" rel="self" type="application/rss+xml"/><item><title>Blog: Runtime selection mechanism for `MeshFreeFoam`</title><link>https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/08/28/runtime-selection-mechanism-for-meshfreefoam/</link><pubDate>Mon, 28 Aug 2023 00:00:00 +0000</pubDate><guid>https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/08/28/runtime-selection-mechanism-for-meshfreefoam/</guid><description>
+&lt;p>In short, I&amp;rsquo;ll stick with OpenFOAM&amp;rsquo;s way of doing things when it comes to:&lt;/p>
 &lt;ul>
 &lt;li>RunTime Selection of models&lt;/li>
 &lt;li>The plugin system (Function Objects)&lt;/li>
 &lt;/ul>
 &lt;h2 id="issue-01-dependency-on-the-openfoam-version">Issue 01: Dependency on the OpenFOAM version&lt;/h2>
-&lt;p>I have decided to run with the master branch from &lt;a href="https://develop.openfoam.com/Development/openfoam">OpenCFD&amp;rsquo;s OpenFOAM&lt;/a> and the very first I encounter is that the RunTime selection mechanism has changed somewhen between &lt;code>v2012&lt;/code> and &lt;code>v2306&lt;/code>. Not cool.&lt;/p>
-&lt;p>So, my solution is to have my own macros for runtime selection but, in the end, they need to be compatible with the version I compile my toolkit with. This is exactly why dependency management will be a challenge on its own.&lt;/p>
+&lt;p>I have decided to run with the master branch from &lt;a href="https://develop.openfoam.com/Development/openfoam">OpenCFD&amp;rsquo;s OpenFOAM&lt;/a>, and the very first issue I encounter is that the RunTime selection mechanism has changed somewhere between &lt;code>v2012&lt;/code> and &lt;code>v2306&lt;/code>. Not cool.&lt;/p>
+&lt;p>So, my solution is to have my own macros for runtime selection, but in the end, they need to be compatible with the version I compile my toolkit with. This is exactly why dependency management will be a challenge on its own.&lt;/p>
 &lt;h2 id="issue-02-going-too-far-with-ood-and-effects-on-gpu-optimization">Issue 02: Going too far with OOD and effects on GPU optimization&lt;/h2>
-&lt;p>When I look at all public projects which are optimizing for GPU offloading (Here is an &lt;a href="https://github.com/exapde/Exasim">example&lt;/a>) there seems to be no tolerance for virtual methods. Actually, NVIDIA explicitly advises to move away from object oriented design.&lt;/p>
-&lt;p>While this is not an option for as, the plan is to have two modes:&lt;/p>
+&lt;p>When I look at all public projects which are optimizing for GPU offloading (Here is an &lt;a href="https://github.com/exapde/Exasim">example&lt;/a>), there seems to be no tolerance for virtual methods. Actually, NVIDIA explicitly advises moving away from object-oriented design.&lt;/p>
+&lt;p>While this is not an option for us, the plan is to have two modes:&lt;/p>
 &lt;ul>
 &lt;li>One mode employing the standard way of doing things in OpenFOAM in terms of RTS&lt;/li>
 &lt;li>A second mode which either leverages &lt;code>dynamicMesh&lt;/code> or some kind of &lt;a href="https://github.com/jmmartinez/easy-just-in-time">&lt;code>JIT compiler&lt;/code>&lt;/a> to generate de-virtualized code at runtime.&lt;/li>
@@ -25,14 +25,14 @@
 &lt;p>Currently, this feature relies on parsing Catch2 XML reports and I doubt this will change. Of course, at this point,&lt;br />
 I&amp;rsquo;m only supporting simple test case reports. I&amp;rsquo;ll expand as I go.&lt;/p></description></item><item><title>Blog: Optimization notes: Part 1</title><link>https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/08/29/optimization-notes-part-1/</link><pubDate>Tue, 29 Aug 2023 00:00:00 +0000</pubDate><guid>https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/08/29/optimization-notes-part-1/</guid><description>
 &lt;h2 id="kdtree-and-radius-based-searches">KdTree and radius-based searches&lt;/h2>
-&lt;p>After sweeping the existing C++ libraries capable of doing k-nearest neighbor (KNN) search with unsorted radius queries, I have reached the conclusion of using &lt;a href="https://github.com/jlblancoc/nanoflann">nanoflann&lt;/a> as a backend for such searches.&lt;/p>
-&lt;p>Their API is nice and easy to use but with one specific caveat: The dynamic &lt;code>KdTree&lt;/code> is not trivial to use. After putting up some unit tests to the KdTree wrapper, I quickly discovered that changing the list of point positions we perform searches against is not fun. My current solution is to hash the current content of the list and check it again on each KNN search!&lt;/p>
-&lt;p>If the list of points has been radically changed, the KdTree index will be invalid; so we need to reset it. But, if the list is only being appended to (no changes to old elements), the new points are added to the index.&lt;/p>
-&lt;p>At this point, I have mainly three unanswered question:&lt;/p>
+&lt;p>When it comes to k-nearest neighbor (KNN) searches with unsorted radius queries in C++, I&amp;rsquo;ve decided to utilize &lt;a href="https://github.com/jlblancoc/nanoflann">nanoflann&lt;/a> as the backend for these operations.&lt;/p>
+&lt;p>Their API is user-friendly, but there&amp;rsquo;s a specific challenge with the dynamic &lt;code>KdTree&lt;/code>. During my testing of the KdTree wrapper, I noticed that modifying the list of point positions for searches can be tricky. To address this, I&amp;rsquo;ve implemented a solution where I hash the current list and compare it before each KNN search.&lt;/p>
+&lt;p>If the point list has undergone significant changes, the KdTree index becomes invalid and needs resetting. However, if the list only receives new points without alterations to old ones, I simply add the new points to the index.&lt;/p>
+&lt;p>At this point, I have three key unanswered questions:&lt;/p>
 &lt;ul>
-&lt;li>How efficient is to hash the point list?&lt;/li>
-&lt;li>How efficient OpenFOAM&amp;rsquo;s implementation of Jenkins hasher is?&lt;/li>
-&lt;li>How efficient is to reset the KdTree index (compared to remove all points and add add the new ones)?&lt;/li>
+&lt;li>What&amp;rsquo;s the efficiency of hashing the point list?&lt;/li>
+&lt;li>How efficient is OpenFOAM&amp;rsquo;s implementation of the Jenkins hasher?&lt;/li>
+&lt;li>Is resetting the KdTree index efficient compared to removing all points and adding the new ones?&lt;/li>
 &lt;/ul></description></item><item><title>Blog: Lazy Evaluation: Part 1</title><link>https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/09/27/lazy-evaluation-part-1/</link><pubDate>Wed, 27 Sep 2023 00:00:00 +0000</pubDate><guid>https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/09/27/lazy-evaluation-part-1/</guid><description>
 &lt;div style="position:relative;padding-bottom:56.25%;">
 &lt;iframe style="width:100%;height:100%;position:absolute;left:0px;top:0px;" frameborder="0" width="100%" height="100%" allowfullscreen="" allow="autoplay" src="./LazyEvaluationAnimation.html">
@@ -113,7 +113,7 @@ Template expression for binary operations on containers in C++
 &lt;div class="card-footer">
 Not suitable for production code. I&amp;rsquo;m sure I can add syntactic sugar, but that&amp;rsquo;s not the point.&lt;/div>
 &lt;/div>
-&lt;p>It&amp;rsquo;s worth noting that on &lt;a href="">Github machines&lt;/a> the execution time of lazy evaluations is a third of that of eager evaluations; while on my local machine, it&amp;rsquo;s around 50%. For the record, the test machine has the following properties:&lt;/p>
+&lt;p>It&amp;rsquo;s worth noting that on &lt;a href="https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources">GitHub machines&lt;/a> the execution time of lazy evaluations is a third of that of eager evaluations; while on my local machine, it&amp;rsquo;s around 50%. For the record, the test machine has the following properties:&lt;/p>
 &lt;pre tabindex="0">&lt;code>System: Kernel: 5.15.0-10078* x86_64 bits: 64 compiler: N/A Desktop: Gnome 3.36.9
 Distro: Ubuntu 20.04.6 LTS (Focal Fossa)
 CPU: Topology: 8-Core model: AMD Ryzen 7 5800H with Radeon Graphics bits: 64 type: MT MCP arch: Zen 3 L2 cache: 4096 KiB
@@ -121,4 +121,32 @@ flags: avx avx2 lm nx pae sse sse2 sse3 sse4_1 sse4_2 sse4a ssse3 svm bogomips: 
 Speed: 1254 MHz min/max: 1200/3200 MHz Core speeds (MHz): 1: 1275 2: 1191 3: 1139 4: 1227 5: 1134 6: 1135 7: 1297
 8: 1296 9: 1135 10: 1135 11: 1135 12: 1133 13: 1286 14: 1171 15: 1517 16: 1161
 &lt;/code>&lt;/pre>&lt;h2 id="conclusion">Conclusion&lt;/h2>
-&lt;p>If GPU acceleration is not important, &lt;code>Views&lt;/code> are the best course of action. This idea might fail horribly though, as everything else.&lt;/p></description></item></channel></rss>
+&lt;p>If GPU acceleration is not important, &lt;code>Views&lt;/code> are the best course of action. This idea might fail horribly though, as everything else.&lt;/p></description></item><item><title>Blog: A reflection system for MeshFreeFoam: Part 1</title><link>https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/09/29/a-reflection-system-for-meshfreefoam-part-1/</link><pubDate>Fri, 29 Sep 2023 00:00:00 +0000</pubDate><guid>https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/09/29/a-reflection-system-for-meshfreefoam-part-1/</guid><description>
+&lt;h2 id="motivation">Motivation&lt;/h2>
+&lt;p>&lt;a href="https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/09/27/lazy-evaluation-part-1/">Lazy evaluation&lt;/a> is not the only thing I envy in &lt;code>.Net&lt;/code> languages. It&amp;rsquo;s one of two things, the other being &lt;strong>their runtime reflection systems&lt;/strong>. This feature is not exclusive to .Net languages; it&amp;rsquo;s found in all reflective languages (e.g., JavaScript, Java, Python, Go, Julia, etc.), except for C++.&lt;/p>
+&lt;p>The perfect implementation of a reflection system for OpenFOAM-based code will:&lt;/p>
+&lt;ol>
+&lt;li>Be fully implemented at compile-time (with zero runtime cost) but allow access to reflection information at runtime.&lt;/li>
+&lt;li>Be compatible with the runtime selection mechanism.&lt;/li>
+&lt;li>Support automatic serialization to JSON/XML for creating objects from a Web UI (or a TUI for that matter).&lt;/li>
+&lt;li>Support building efficient proxy classes for objects to expose (private? protected?) fields to Web UI widgets.&lt;/li>
+&lt;/ol>
+&lt;h2 id="current-plans">Current plans&lt;/h2>
+&lt;p>It doesn&amp;rsquo;t seem like a lot of work, but the challenges lie in meeting my specific requirements 1 and 2 above. There are two ways to achieve this:&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>&lt;a href="https://youtu.be/DUiUBt-fqEY">Building a C++ Reflection System in One Weekend Using Clang and LLVM&lt;/a> demonstrates a method using compiler magic to generate reflection code. It parses the headers&amp;rsquo; AST and generates C++ files to include in the final compilation units. This approach is not preferred due to two main reasons:&lt;/p>
+&lt;ul>
+&lt;li>It requires annotating classes and fields for reflection.&lt;/li>
+&lt;li>A separate tool must run on the classes&amp;rsquo; headers with the correct compiler flags set to generate the reflection code, adding maintenance overhead.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;a href="https://github.com/veselink1/refl-cpp">refl-cpp&lt;/a> implements a version without parsing the AST, which is the preferred approach. It will serve as the main inspiration for developing the reflection system.&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;p>Work on this front will begin as soon as I can visualize the meshfree domain (i.e., the particles) with ParaView. Immediate issues that must be addressed include:&lt;/p>
+&lt;ul>
+&lt;li>Ensuring both the reflection system and the runtime selection mechanism can coexist smoothly.&lt;/li>
+&lt;li>Exposing fields of default OpenFOAM types (e.g., &lt;code>List&lt;/code>, &lt;code>triSurface&lt;/code>, etc.), which may not be trivial.&lt;/li>
+&lt;/ul></description></item></channel></rss>

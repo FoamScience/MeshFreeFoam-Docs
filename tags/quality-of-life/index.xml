@@ -1,0 +1,29 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>MeshFreeFoam API Docs – quality-of-life</title><link>https://foamscience.github.io/MeshFreeFoam-Docs/tags/quality-of-life/</link><description>Recent content in quality-of-life on MeshFreeFoam API Docs</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Fri, 29 Sep 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://foamscience.github.io/MeshFreeFoam-Docs/tags/quality-of-life/index.xml" rel="self" type="application/rss+xml"/><item><title>Blog: A reflection system for MeshFreeFoam: Part 1</title><link>https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/09/29/a-reflection-system-for-meshfreefoam-part-1/</link><pubDate>Fri, 29 Sep 2023 00:00:00 +0000</pubDate><guid>https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/09/29/a-reflection-system-for-meshfreefoam-part-1/</guid><description>
+&lt;h2 id="motivation">Motivation&lt;/h2>
+&lt;p>&lt;a href="https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/09/27/lazy-evaluation-part-1/">Lazy evaluation&lt;/a> is not the only thing I envy in &lt;code>.Net&lt;/code> languages. It&amp;rsquo;s one of two things, the other being &lt;strong>their runtime reflection systems&lt;/strong>. This feature is not exclusive to .Net languages; it&amp;rsquo;s found in all reflective languages (e.g., JavaScript, Java, Python, Go, Julia, etc.), except for C++.&lt;/p>
+&lt;p>The perfect implementation of a reflection system for OpenFOAM-based code will:&lt;/p>
+&lt;ol>
+&lt;li>Be fully implemented at compile-time (with zero runtime cost) but allow access to reflection information at runtime.&lt;/li>
+&lt;li>Be compatible with the runtime selection mechanism.&lt;/li>
+&lt;li>Support automatic serialization to JSON/XML for creating objects from a Web UI (or a TUI for that matter).&lt;/li>
+&lt;li>Support building efficient proxy classes for objects to expose (private? protected?) fields to Web UI widgets.&lt;/li>
+&lt;/ol>
+&lt;h2 id="current-plans">Current plans&lt;/h2>
+&lt;p>It doesn&amp;rsquo;t seem like a lot of work, but the challenges lie in meeting my specific requirements 1 and 2 above. There are two ways to achieve this:&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>&lt;a href="https://youtu.be/DUiUBt-fqEY">Building a C++ Reflection System in One Weekend Using Clang and LLVM&lt;/a> demonstrates a method using compiler magic to generate reflection code. It parses the headers&amp;rsquo; AST and generates C++ files to include in the final compilation units. This approach is not preferred due to two main reasons:&lt;/p>
+&lt;ul>
+&lt;li>It requires annotating classes and fields for reflection.&lt;/li>
+&lt;li>A separate tool must run on the classes&amp;rsquo; headers with the correct compiler flags set to generate the reflection code, adding maintenance overhead.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;a href="https://github.com/veselink1/refl-cpp">refl-cpp&lt;/a> implements a version without parsing the AST, which is the preferred approach. It will serve as the main inspiration for developing the reflection system.&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;p>Work on this front will begin as soon as I can visualize the meshfree domain (i.e., the particles) with ParaView. Immediate issues that must be addressed include:&lt;/p>
+&lt;ul>
+&lt;li>Ensuring both the reflection system and the runtime selection mechanism can coexist smoothly.&lt;/li>
+&lt;li>Exposing fields of default OpenFOAM types (e.g., &lt;code>List&lt;/code>, &lt;code>triSurface&lt;/code>, etc.), which may not be trivial.&lt;/li>
+&lt;/ul></description></item></channel></rss>

@@ -78,7 +78,7 @@ Template expression for binary operations on containers in C++
 &lt;div class="card-footer">
 Not suitable for production code. I&amp;rsquo;m sure I can add syntactic sugar, but that&amp;rsquo;s not the point.&lt;/div>
 &lt;/div>
-&lt;p>It&amp;rsquo;s worth noting that on &lt;a href="">Github machines&lt;/a> the execution time of lazy evaluations is a third of that of eager evaluations; while on my local machine, it&amp;rsquo;s around 50%. For the record, the test machine has the following properties:&lt;/p>
+&lt;p>It&amp;rsquo;s worth noting that on &lt;a href="https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources">GitHub machines&lt;/a> the execution time of lazy evaluations is a third of that of eager evaluations; while on my local machine, it&amp;rsquo;s around 50%. For the record, the test machine has the following properties:&lt;/p>
 &lt;pre tabindex="0">&lt;code>System: Kernel: 5.15.0-10078* x86_64 bits: 64 compiler: N/A Desktop: Gnome 3.36.9
 Distro: Ubuntu 20.04.6 LTS (Focal Fossa)
 CPU: Topology: 8-Core model: AMD Ryzen 7 5800H with Radeon Graphics bits: 64 type: MT MCP arch: Zen 3 L2 cache: 4096 KiB
