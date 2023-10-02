@@ -1,4 +1,4 @@
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>MeshFreeFoam API Docs – gui</title><link>https://foamscience.github.io/MeshFreeFoam-Docs/tags/gui/</link><description>Recent content in gui on MeshFreeFoam API Docs</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Fri, 29 Sep 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://foamscience.github.io/MeshFreeFoam-Docs/tags/gui/index.xml" rel="self" type="application/rss+xml"/><item><title>Blog: A reflection system for MeshFreeFoam: Part 1</title><link>https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/09/29/a-reflection-system-for-meshfreefoam-part-1/</link><pubDate>Fri, 29 Sep 2023 00:00:00 +0000</pubDate><guid>https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/09/29/a-reflection-system-for-meshfreefoam-part-1/</guid><description>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>MeshFreeFoam API Docs – gui</title><link>https://foamscience.github.io/MeshFreeFoam-Docs/tags/gui/</link><description>Recent content in gui on MeshFreeFoam API Docs</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 02 Oct 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://foamscience.github.io/MeshFreeFoam-Docs/tags/gui/index.xml" rel="self" type="application/rss+xml"/><item><title>Blog: A reflection system for MeshFreeFoam: Part 1</title><link>https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/09/29/a-reflection-system-for-meshfreefoam-part-1/</link><pubDate>Fri, 29 Sep 2023 00:00:00 +0000</pubDate><guid>https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/09/29/a-reflection-system-for-meshfreefoam-part-1/</guid><description>
 &lt;h2 id="motivation">Motivation&lt;/h2>
 &lt;p>&lt;a href="https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/09/27/lazy-evaluation-part-1/">Lazy evaluation&lt;/a> is not the only thing I envy in &lt;code>.Net&lt;/code> languages. It&amp;rsquo;s one of two things, the other being &lt;strong>their runtime reflection systems&lt;/strong>. This feature is not exclusive to .Net languages; it&amp;rsquo;s found in all reflective languages (e.g., JavaScript, Java, Python, Go, Julia, etc.), except for C++.&lt;/p>
 &lt;p>The perfect implementation of a reflection system for OpenFOAM-based code will:&lt;/p>
@@ -9,7 +9,7 @@
 &lt;li>Support building efficient proxy classes for objects to expose (private? protected?) fields to Web UI widgets.&lt;/li>
 &lt;/ol>
 &lt;h2 id="current-plans">Current plans&lt;/h2>
-&lt;p>It doesn&amp;rsquo;t seem like a lot of work, but the challenges lie in meeting my specific requirements 1 and 2 above. There are two ways to achieve this:&lt;/p>
+&lt;p>It doesn&amp;rsquo;t seem like a lot of work, but the challenges lie in meeting my specific requirements 1 and 2 above. There are few ways to achieve this:&lt;/p>
 &lt;ol>
 &lt;li>
 &lt;p>&lt;a href="https://youtu.be/DUiUBt-fqEY">Building a C++ Reflection System in One Weekend Using Clang and LLVM&lt;/a> demonstrates a method using compiler magic to generate reflection code. It parses the headers&amp;rsquo; AST and generates C++ files to include in the final compilation units. This approach is not preferred due to two main reasons:&lt;/p>
@@ -21,9 +21,73 @@
 &lt;li>
 &lt;p>&lt;a href="https://github.com/veselink1/refl-cpp">refl-cpp&lt;/a> implements a version without parsing the AST, which is the preferred approach. It will serve as the main inspiration for developing the reflection system.&lt;/p>
 &lt;/li>
+&lt;li>
+&lt;p>&lt;a href="https://clementpirelli.wordpress.com/2021/12/08/cpp-reflection-ts-first-look/">C++ Reflection TS&lt;/a> can be option for future projects. But as, at best, It&amp;rsquo;ll make into the standard by c++26, and we&amp;rsquo;ll have to wait for 1-2 years for compiler support, it&amp;rsquo;s better if we don&amp;rsquo;t rely on such experimental proposals. Currently, only &lt;code>clang&lt;/code> can compile code from the proposal.&lt;/p>
+&lt;/li>
 &lt;/ol>
 &lt;p>Work on this front will begin as soon as I can visualize the meshfree domain (i.e., the particles) with ParaView. Immediate issues that must be addressed include:&lt;/p>
 &lt;ul>
 &lt;li>Ensuring both the reflection system and the runtime selection mechanism can coexist smoothly.&lt;/li>
 &lt;li>Exposing fields of default OpenFOAM types (e.g., &lt;code>List&lt;/code>, &lt;code>triSurface&lt;/code>, etc.), which may not be trivial.&lt;/li>
-&lt;/ul></description></item></channel></rss>
+&lt;/ul></description></item><item><title>Blog: A reflection system for MeshFreeFoam: Part 2</title><link>https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/10/02/a-reflection-system-for-meshfreefoam-part-2/</link><pubDate>Mon, 02 Oct 2023 00:00:00 +0000</pubDate><guid>https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/10/02/a-reflection-system-for-meshfreefoam-part-2/</guid><description>
+&lt;p>The &lt;a href="https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/09/29/a-reflection-system-for-meshfreefoam-part-1/">previous post&lt;/a> a few days ago introduced the idea of leveraging a reflection system to automatically build UIs for MeshFreeFoam classes that stay up to date with code changes.&lt;/p>
+&lt;p>In this post, I outline what&amp;rsquo;s currently possible, what&amp;rsquo;s not, and what&amp;rsquo;s missing.&lt;/p>
+&lt;h2 id="ui-for-openfoam-rts-based-models-what-works">UI for OpenFOAM RTS-based models (What works)&lt;/h2>
+&lt;p>Imagine if you can have the following base model class, which acts as a base for OpenFOAM&amp;rsquo;s runtime selection table:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-cpp" data-lang="cpp">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#080;font-weight:bold">class&lt;/span> &lt;span style="color:#b06;font-weight:bold">baseModel&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#080;font-weight:bold">protected&lt;/span>&lt;span style="color:#333">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> label m_;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> vector vv_;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#080;font-weight:bold">public&lt;/span>&lt;span style="color:#333">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> TypeName(&lt;span style="background-color:#fff0f0">&amp;#34;baseModel&amp;#34;&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> declareRunTimeSelectionTable
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> (
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> autoPtr,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> baseModel,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> dictionary,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> (
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#080;font-weight:bold">const&lt;/span> dictionary&lt;span style="color:#333">&amp;amp;&lt;/span> dict
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ),
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> (dict)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> );
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#080;font-weight:bold">static&lt;/span> autoPtr&lt;span style="color:#333">&amp;lt;&lt;/span>baseModel&lt;span style="color:#333">&amp;gt;&lt;/span> New(&lt;span style="color:#080;font-weight:bold">const&lt;/span> dictionary&lt;span style="color:#333">&amp;amp;&lt;/span> dict);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>};
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>defineTypeNameAndDebug(baseModel, &lt;span style="color:#00d;font-weight:bold">0&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>defineRunTimeSelectionTable(baseModel, dictionary);
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>And a number of derived models; participating in the runtime selection using a dictionary:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-cpp" data-lang="cpp">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#080;font-weight:bold">class&lt;/span> &lt;span style="color:#b06;font-weight:bold">childModel&lt;/span> &lt;span style="color:#333">:&lt;/span> &lt;span style="color:#080;font-weight:bold">public&lt;/span> baseModel
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#080;font-weight:bold">protected&lt;/span>&lt;span style="color:#333">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> word type_;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#080;font-weight:bold">public&lt;/span>&lt;span style="color:#333">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> TypeName(&lt;span style="background-color:#fff0f0">&amp;#34;childModel&amp;#34;&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>};
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>defineTypeNameAndDebug(childModel, &lt;span style="color:#00d;font-weight:bold">0&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>addToRunTimeSelectionTable(baseModel, childModel, dictionary);
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>How useful would it be to &lt;strong>automatically&lt;/strong> generate a schema of the required dictionary entries for &lt;strong>each model&lt;/strong>?&lt;/p>
+&lt;p>Well, what if you could:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-cpp" data-lang="cpp">&lt;span style="display:flex;">&lt;span>Info &lt;span style="color:#333">&amp;lt;&amp;lt;&lt;/span> generateSchema&lt;span style="color:#333">&amp;lt;&lt;/span>childModel&lt;span style="color:#333">&amp;gt;&lt;/span>() &lt;span style="color:#333">&amp;lt;&amp;lt;&lt;/span> endl;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>and get the following output (note how members from the base class get picked up too! and how correct defaults get chosen for each member):&lt;/p>
+&lt;pre tabindex="0">&lt;code>{
+type_ &amp;#34;&amp;#34;;
+m_ 0;
+vv_ ( 0 0 0 );
+}
+&lt;/code>&lt;/pre>&lt;p>Up to this level; we can do this with the assist of reflections. In fact, this has nothing to do with the RTS. It can be done to any class. Here is a quick animation illustrating the Interactive UI application from &lt;a href="https://github.com/FoamScience/openfoam-reflections">openfoam-reflections&lt;/a>:&lt;/p>
+&lt;div style="position:relative;padding-bottom:56.25%;">
+&lt;iframe style="width:100%;height:100%;position:absolute;left:0px;top:0px;" frameborder="0" width="100%" height="100%" allowfullscreen="" allow="autoplay" src="./ReflectionsRTSAnimation.html">
+&lt;/iframe>
+&lt;/div>
+&lt;h2 id="ui-for-openfoam-rts-based-models-what-doesnt-work">UI for OpenFOAM RTS-based models (What doesn&amp;rsquo;t work)&lt;/h2>
+&lt;p>Pushing it a little further, can we walk users through the process of generating a valid dictionary for a &lt;code>baseModel&lt;/code> to be constructed (!automatically!)? Envision the following workflow in case &lt;code>baseModel&lt;/code> is both &lt;strong>an abstract class&lt;/strong> and &lt;strong>a base for dictionary-based runtime selection&lt;/strong>:&lt;/p>
+&lt;ol>
+&lt;li>Prompt users to pick a valid child for &lt;code>baseModel&lt;/code> (In this case, present them with &lt;code>childModel&lt;/code> as the only option)&lt;/li>
+&lt;li>Keep prompting them for required members of &lt;code>childModel&lt;/code>. Naturally we don&amp;rsquo;t want to hardcode the logic there; we want the compiler to generate the required code for us. This way, as we add class members, we won&amp;rsquo;t have to change the UI code.&lt;/li>
+&lt;/ol>
+&lt;p>Well, it turns out we can achieve the first step by looking into the runtime selection table. But the next step is tricky since there will be a need to convert a string (user input) to a C++ type. The runtime selection table itself gets around this issue by keeping pointers to constructors. It&amp;rsquo;s not obvious to me how can we get hold of the concrete type at the moment. In addition, because the reflection is done at compile-time, the &lt;code>childModel&lt;/code> header needs to be included in the UI code, which defeats the purpose of the RTS.&lt;/p>
+&lt;p>Also, some special members will need to be handled explicitly, such as having an &lt;code>autoPtr&amp;lt;something&amp;gt;&lt;/code> that initiates another RTS model.&lt;/p>
+&lt;h2 id="conclusion">Conclusion&lt;/h2>
+&lt;p>While the adopted reflection system has a variety of uses such as iterating over class&amp;rsquo;s member fields and functions, iterating over bases of a class, and even building powerful proxies, using to reflect RTS types doesn&amp;rsquo;t seem possible at the moment.&lt;/p></description></item></channel></rss>
