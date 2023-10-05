@@ -1,4 +1,4 @@
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>MeshFreeFoam API Docs – quality-of-life</title><link>https://foamscience.github.io/MeshFreeFoam-Docs/tags/quality-of-life/</link><description>Recent content in quality-of-life on MeshFreeFoam API Docs</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 02 Oct 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://foamscience.github.io/MeshFreeFoam-Docs/tags/quality-of-life/index.xml" rel="self" type="application/rss+xml"/><item><title>Blog: A reflection system for MeshFreeFoam: Part 1</title><link>https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/09/29/a-reflection-system-for-meshfreefoam-part-1/</link><pubDate>Fri, 29 Sep 2023 00:00:00 +0000</pubDate><guid>https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/09/29/a-reflection-system-for-meshfreefoam-part-1/</guid><description>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>MeshFreeFoam API Docs – quality-of-life</title><link>https://foamscience.github.io/MeshFreeFoam-Docs/tags/quality-of-life/</link><description>Recent content in quality-of-life on MeshFreeFoam API Docs</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Thu, 05 Oct 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://foamscience.github.io/MeshFreeFoam-Docs/tags/quality-of-life/index.xml" rel="self" type="application/rss+xml"/><item><title>Blog: A reflection system for MeshFreeFoam: Part 1</title><link>https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/09/29/a-reflection-system-for-meshfreefoam-part-1/</link><pubDate>Fri, 29 Sep 2023 00:00:00 +0000</pubDate><guid>https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/09/29/a-reflection-system-for-meshfreefoam-part-1/</guid><description>
 &lt;h2 id="motivation">Motivation&lt;/h2>
 &lt;p>&lt;a href="https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/09/27/lazy-evaluation-part-1/">Lazy evaluation&lt;/a> is not the only thing I envy in &lt;code>.Net&lt;/code> languages. It&amp;rsquo;s one of two things, the other being &lt;strong>their runtime reflection systems&lt;/strong>. This feature is not exclusive to .Net languages; it&amp;rsquo;s found in all reflective languages (e.g., JavaScript, Java, Python, Go, Julia, etc.), except for C++.&lt;/p>
 &lt;p>The perfect implementation of a reflection system for OpenFOAM-based code will:&lt;/p>
@@ -90,4 +90,127 @@ vv_ ( 0 0 0 );
 &lt;p>Well, it turns out we can achieve the first step by looking into the runtime selection table. But the next step is tricky since there will be a need to convert a string (user input) to a C++ type. The runtime selection table itself gets around this issue by keeping pointers to constructors. It&amp;rsquo;s not obvious to me how can we get hold of the concrete type at the moment. In addition, because the reflection is done at compile-time, the &lt;code>childModel&lt;/code> header needs to be included in the UI code, which defeats the purpose of the RTS.&lt;/p>
 &lt;p>Also, some special members will need to be handled explicitly, such as having an &lt;code>autoPtr&amp;lt;something&amp;gt;&lt;/code> that initiates another RTS model.&lt;/p>
 &lt;h2 id="conclusion">Conclusion&lt;/h2>
-&lt;p>While the adopted reflection system has a variety of uses such as iterating over class&amp;rsquo;s member fields and functions, iterating over bases of a class, and even building powerful proxies, using to reflect RTS types doesn&amp;rsquo;t seem possible at the moment.&lt;/p></description></item></channel></rss>
+&lt;p>While the adopted reflection system has a variety of uses such as iterating over class&amp;rsquo;s member fields and functions, iterating over bases of a class, and even building powerful proxies, using to reflect RTS types doesn&amp;rsquo;t seem possible at the moment.&lt;/p></description></item><item><title>Blog: A reflection system for MeshFreeFoam: Part 3</title><link>https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/10/05/a-reflection-system-for-meshfreefoam-part-3/</link><pubDate>Thu, 05 Oct 2023 00:00:00 +0000</pubDate><guid>https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/10/05/a-reflection-system-for-meshfreefoam-part-3/</guid><description>
+&lt;p>The &lt;a href="https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/10/02/a-reflection-system-for-meshfreefoam-part-2/">previous post&lt;/a> outlined the main challenges in implementing a decent reflection system for OpenFOAM while preserving the benefits of the runtime selection mechanism.&lt;/p>
+&lt;p>In this post, I describe the final state of the system and its limitations, along with some implementation details.&lt;/p>
+&lt;h2 id="make-classes-reflect-themselves">Make classes reflect themselves?&lt;/h2>
+&lt;p>From the previous post, we have deduced that it is mainly possible to automatically generate a schema for a class. The only case where generating such a schema proves difficult is when nesting RTS models. So, let&amp;rsquo;s explore how this issue can be resolved. Assume the following abstract base class, which has a few reflected members:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-cpp" data-lang="cpp">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#579"># These are only reflected members of baseModel, it can have non-reflected ones
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#579">&lt;/span>baseModel
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#333">|--&amp;gt;&lt;/span> key_ (autoPtr&lt;span style="color:#333">&amp;lt;&lt;/span>word&lt;span style="color:#333">&amp;gt;&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#333">|--&amp;gt;&lt;/span> m_ (label)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#333">|--&amp;gt;&lt;/span> vv_ (Vector&lt;span style="color:#333">&amp;lt;&lt;/span>scalar&lt;span style="color:#333">&amp;gt;&lt;/span>)
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>For the sake of code maintainability, let&amp;rsquo;s say that we have a static member of a template class &lt;code>builder&amp;lt;T&amp;gt;::schema()&lt;/code> which returns the following dictionary if executed with &lt;code>[T = baseModel]&lt;/code> (note that the RTS mechanism is consulted for available model options):&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-cpp" data-lang="cpp">&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> baseModelType &lt;span style="background-color:#fff0f0">&amp;#34;__one of ( childModel childModel1 childModel2 )__&amp;#34;&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> key &lt;span style="background-color:#fff0f0">&amp;#34;__optional Foam::word here__&amp;#34;&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> m &lt;span style="color:#00d;font-weight:bold">0&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> vv ( &lt;span style="color:#00d;font-weight:bold">0&lt;/span> &lt;span style="color:#00d;font-weight:bold">0&lt;/span> &lt;span style="color:#00d;font-weight:bold">0&lt;/span> );
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Such schema is possible to achieve entirely because of the compile-time reflection system and C++ concepts. But notice that once a user chooses an implemented model, the schema will be missing the members from the chosen &lt;code>childModel&lt;/code>.&lt;/p>
+&lt;p>A simple test of such schema methods:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-cpp" data-lang="cpp">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#080;font-weight:bold">constexpr&lt;/span> &lt;span style="color:#339;font-weight:bold">bool&lt;/span> hasSchema &lt;span style="color:#333">=&lt;/span> SelfReflectableModel&lt;span style="color:#333">&amp;lt;&lt;/span>childModel&lt;span style="color:#333">&amp;gt;&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#080;font-weight:bold">if&lt;/span> &lt;span style="color:#06b;font-weight:bold">constexpr&lt;/span> (hasSchema) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> dict &lt;span style="color:#333">=&lt;/span> schema&lt;span style="color:#333">&amp;lt;&lt;/span>childModel&lt;span style="color:#333">&amp;gt;&lt;/span>();
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>will result in the following schema:&lt;/p>
+&lt;pre tabindex="0">&lt;code>{
+baseModelType childModel;
+type ;
+subModel
+{
+baseModelType &amp;#34;__one of ( childModel childModel1 childModel2 )__&amp;#34;;
+key &amp;#34;__optional Foam::word here__&amp;#34;;
+m 0;
+vv ( 0 0 0 );
+}
+key &amp;#34;__optional Foam::word here__&amp;#34;;
+m 0;
+vv ( 0 0 0 );
+}
+&lt;/code>&lt;/pre>&lt;p>for a child type which has the following members (Both the nested RTS model &lt;code>subModel_&lt;/code>, the &lt;code>type_&lt;/code> member don&amp;rsquo;t show up in the earlier schema):&lt;/p>
+&lt;pre tabindex="0">&lt;code>childModel : public baseModel
+|--&amp;gt; type_ (word)
+|--&amp;gt; subModel_ (autoPtr&amp;lt;baseModel&amp;gt;)
+&lt;/code>&lt;/pre>&lt;blockquote>
+&lt;p>From this experiment, we deduce that generating schemas for abstract base classes is way less important than for concrete implementations of the target models.&lt;/p>
+&lt;/blockquote>
+&lt;p>Note that the previous C++ code snippet features &lt;strong>compile-time if statements&lt;/strong> which execute the schema method only if the target type is self-reflectable (a fancy way to say: the type has a &lt;code>schema&lt;/code> method). If it is not the case, the compiler generates no code. Hence, the runtime cost occurs only if the type is self-reflectable, in which case, an OpenFOAM dictionary is built from the target type&amp;rsquo;s members.&lt;/p>
+&lt;p>In addition, concepts help generate code for specific cases. A good example is to fill the dictionary values with default-constructed values of the members only if the member type is default-constructible.&lt;/p>
+&lt;p>Special cases for some class members can be also treated. As an example, take a member which is an &lt;code>autoPtr&amp;lt;Something&amp;gt;&lt;/code>. If the member points to a RTS-managed type (such us &lt;code>baseModel&lt;/code>, &lt;code>childModel&lt;/code>&amp;hellip; etc), we will want to execute the schema function from that type. This is how the schema for the &lt;code>childModel::subModel_&lt;/code> for example is generated while generating the schema for &lt;code>childModel&lt;/code>.&lt;/p>
+&lt;p>In the case of the pointed-to member type is not RTS-managed (eg. a simple &lt;code>word&lt;/code> as in &lt;code>childModel::key_&lt;/code>), we can assume that it&amp;rsquo;s an optional input and hint that assumption to the end user!&lt;/p>
+&lt;h2 id="runtime-selection-to-the-rescue">Runtime selection to the rescue&lt;/h2>
+&lt;p>Reflection is traditionally tailored towards POD ( plain-old-data, which define little behavior ) structures, and using it together with the runtime selection mechanism proves to be difficult. One of the main issues that we particularly need the classes to generate their schema on their own is that we don&amp;rsquo;t want to include all headers in the application (include only those of the base classes), and allow users to dynamically load their libraries). One way of doing this would be to make the &lt;code>schema&lt;/code> method an &lt;strong>abstract method&lt;/strong> on base classes.&lt;/p>
+&lt;p>On the other hand, we need to generate a schema without creating any objects of the target type, so &lt;code>schema&lt;/code> must also be &lt;strong>static&lt;/strong>. Since there is no such thing as a &lt;strong>static virtual method&lt;/strong>, we have to resolve this in another way.&lt;/p>
+&lt;p>These conflicting interests are the exact reason behind the runtime selection mechanism, so we can simply abuse to, instead of building a table of constructors, build a table of function points which points to a free method (or a static in a template class):&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-cpp" data-lang="cpp">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#888">// The table of function pointers (for illustration purposes only, function pointers are not stored like this)
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#888">&lt;/span>(
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> childModel &lt;span style="color:#333">&amp;amp;&lt;/span>builder&lt;span style="color:#333">&amp;lt;&lt;/span>childModel&lt;span style="color:#333">&amp;gt;::&lt;/span>schema()
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> childModel1 &lt;span style="color:#333">&amp;amp;&lt;/span>builder&lt;span style="color:#333">&amp;lt;&lt;/span>childModel1&lt;span style="color:#333">&amp;gt;::&lt;/span>schema()
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> childModel2 &lt;span style="color:#333">&amp;amp;&lt;/span>builder&lt;span style="color:#333">&amp;lt;&lt;/span>childModel2&lt;span style="color:#333">&amp;gt;::&lt;/span>schema()
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>)
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Then we leverage the same mechanism &lt;code>::New&lt;/code> uses to create objects by looking up the table for the model we want; and then call the function through the stored function pointer.&lt;/p>
+&lt;h2 id="a-recap-of-the-api-to-generate-model-schemas">A recap of the API to generate model schemas&lt;/h2>
+&lt;p>The base block for the whole mechanism would be a static member method to generate a schema for the target type &lt;code>T&lt;/code>. This method has to have all desired features (eg. can call itself if a member of &lt;code>T&lt;/code> is an &lt;code>autoPtr&amp;lt;U&amp;gt;&lt;/code> if U is also an RTS-managed class):&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-cpp" data-lang="cpp">&lt;span style="display:flex;">&lt;span>dictionary builder&lt;span style="color:#333">&amp;lt;&lt;/span>T&lt;span style="color:#333">&amp;gt;::&lt;/span>schema()
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>The next layer is a set of static members that need to be present on the base class. Basically, a hash table of regular function pointers, and a few methods to construct and destroy the table. A subclass to the base class is also need so we can use to add children to the table. All of this can be hidden behind a few macros easily.&lt;/p>
+&lt;p>Similarly to &lt;code>::New()&lt;/code>, base classes then can have a &lt;code>baseModel::schema(const word&amp;amp;)&lt;/code> static method which looks up the hash table for the passed-in model type name and calls the corresponding function.&lt;/p>
+&lt;p>The child classes will also have to initialize a static member for a specific type so they get added to the hash table automatically (static initialization happens before &lt;code>main&lt;/code>).&lt;/p>
+&lt;p>Let&amp;rsquo;s look at a full application example, which presents the user with available options for a &lt;code>baseModel&lt;/code> and generates a schema for &lt;strong>the chosen concrete implementation&lt;/strong>:&lt;/p>
+&lt;blockquote>
+&lt;p>Notice how there is no explicit mentioning of child classes.&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-cpp" data-lang="cpp">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#888">// OpenFOAM includes....
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#888">&lt;/span>&lt;span style="color:#579">#include&lt;/span> &lt;span style="color:#579">&amp;#34;baseModel.H&amp;#34;&lt;/span>&lt;span style="color:#579">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#579">&lt;/span>&lt;span style="color:#339;font-weight:bold">int&lt;/span> &lt;span style="color:#06b;font-weight:bold">main&lt;/span>()
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> Info &lt;span style="color:#333">&amp;lt;&amp;lt;&lt;/span> &lt;span style="background-color:#fff0f0">&amp;#34;Choose a Model from available baseModels:&amp;#34;&lt;/span> &lt;span style="color:#333">&amp;lt;&amp;lt;&lt;/span> endl;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> Info &lt;span style="color:#333">&amp;lt;&amp;lt;&lt;/span> mff&lt;span style="color:#333">::&lt;/span>baseModel&lt;span style="color:#333">::&lt;/span>schemasPtr_&lt;span style="color:#333">-&amp;gt;&lt;/span>toc() &lt;span style="color:#333">&amp;lt;&amp;lt;&lt;/span> endl;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> word modelType;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> std&lt;span style="color:#333">::&lt;/span>getline(std&lt;span style="color:#333">::&lt;/span>cin, modelType);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> Info &lt;span style="color:#333">&amp;lt;&amp;lt;&lt;/span> &lt;span style="background-color:#fff0f0">&amp;#34;Here is how you&amp;#39;re supposed to construct a &amp;#34;&lt;/span> &lt;span style="color:#333">&amp;lt;&amp;lt;&lt;/span> modelType &lt;span style="color:#333">&amp;lt;&amp;lt;&lt;/span> endl;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> Info &lt;span style="color:#333">&amp;lt;&amp;lt;&lt;/span> mff&lt;span style="color:#333">::&lt;/span>baseModel&lt;span style="color:#333">::&lt;/span>schema(modelType) &lt;span style="color:#333">&amp;lt;&amp;lt;&lt;/span> endl;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#080;font-weight:bold">return&lt;/span> &lt;span style="color:#00d;font-weight:bold">0&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;pre tabindex="0">&lt;code>{
+baseModelType childModel;
+type ;
+subModel
+{
+baseModelType &amp;#34;__one of ( childModel childModel1 childModel2 )__&amp;#34;;
+key &amp;#34;__optional Foam::word here__&amp;#34;;
+m 0;
+vv ( 0 0 0 );
+}
+key &amp;#34;__optional Foam::word here__&amp;#34;;
+m 0;
+vv ( 0 0 0 );
+}
+&lt;/code>&lt;/pre>&lt;p>&lt;strong>Beautiful!&lt;/strong> 🎉 🥳&lt;/p>
+&lt;h2 id="going-the-extra-mile">Going the extra-mile&lt;/h2>
+&lt;p>There a couple of loose ends to tie up:&lt;/p>
+&lt;h3 id="defaulted-values-for-members">Defaulted values for members???&lt;/h3>
+&lt;p>As it stands now, the schemas will suggest default values for members as in &amp;ldquo;default values for C++ types&amp;rdquo;. It would be interesting if we could extract the actual default values of the members as used in the target&amp;rsquo;s type construction (They properly have more physical meaning)!&lt;/p>
+&lt;p>This turns out not be so easy. One idea that comes to mind is to first create a schema for the target type ignoring all optional members; then use that schema to actually create an object of the target type. From there, it only remains to check the values of the optional members.&lt;/p>
+&lt;p>But this is not possible since objects can be creating from all kinds of objects (and not just from a dictionary) and restricting that doesn&amp;rsquo;t look like a good idea.&lt;/p>
+&lt;h3 id="complete-nested-models-schemas">Complete nested models schemas???&lt;/h3>
+&lt;p>If we look closely at the generated schema from the previous example:&lt;/p>
+&lt;pre tabindex="0">&lt;code>{
+baseModelType childModel;
+type ;
+subModel
+{
+baseModelType &amp;#34;__one of ( childModel childModel1 childModel2 )__&amp;#34;;
+key &amp;#34;__optional Foam::word here__&amp;#34;;
+m 0;
+vv ( 0 0 0 );
+}
+key &amp;#34;__optional Foam::word here__&amp;#34;;
+m 0;
+vv ( 0 0 0 );
+}
+&lt;/code>&lt;/pre>&lt;p>we can see that the &lt;code>subModel&lt;/code> shows only members of the base class. To make it show the full array of members of the concrete type, the user can prompted to pick a valid model, and then &lt;code>baseModel::schema(&amp;quot;pickedModel&amp;quot;)&lt;/code> will be called inside &lt;code>builder::schema&amp;lt;baseModel&amp;gt;()&lt;/code> instead of calling &lt;code>builder::schema&amp;lt;memberBaseType&amp;gt;()&lt;/code>. This scenario is particularly in building GUIs.&lt;/p>
+&lt;h2 id="conclusion">Conclusion&lt;/h2>
+&lt;p>At this points, all of the design goals mentioned back in &lt;a href="https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/09/29/a-reflection-system-for-meshfreefoam-part-1/">Part 1&lt;/a> have been achieved. Except for minor changes, I will not develop the system any further.&lt;/p>
+&lt;p>Use cases are exclusively &lt;strong>(automatically) generating schemas for OpenFOAM classes&lt;/strong> and &lt;strong>(again automatically) building GUI widgets for target types&lt;/strong>&lt;/p>
+&lt;p>You can find the final product with a sample application to iteratively generate a dictionary for some basic models at &lt;a href="https://github.com/FoamScience/openfoam-reflections">FoamScience/openfoam-reflections&lt;/a>.&lt;/p></description></item></channel></rss>
