@@ -365,7 +365,7 @@ key &amp;#34;__optional Foam::word here__&amp;#34;;
 m 0;
 vv ( 0 0 0 );
 }
-&lt;/code>&lt;/pre>&lt;p>for a child type which has the following members (Both the nested RTS model &lt;code>subModel_&lt;/code>, the &lt;code>type_&lt;/code> member don&amp;rsquo;t show up in the earlier schema):&lt;/p>
+&lt;/code>&lt;/pre>&lt;p>for a child type which has the following members (Both the nested RTS model &lt;code>subModel_&lt;/code> and the &lt;code>type_&lt;/code> member now show up in the schema):&lt;/p>
 &lt;pre tabindex="0">&lt;code>childModel : public baseModel
 |--&amp;gt; type_ (word)
 |--&amp;gt; subModel_ (autoPtr&amp;lt;baseModel&amp;gt;)
@@ -429,8 +429,21 @@ vv ( 0 0 0 );
 &lt;h3 id="defaulted-values-for-members">Defaulted values for members???&lt;/h3>
 &lt;p>As it stands now, the schemas will suggest default values for members as in &amp;ldquo;default values for C++ types&amp;rdquo;. It would be interesting if we could extract the actual default values of the members as used in the target&amp;rsquo;s type construction (They properly have more physical meaning)!&lt;/p>
 &lt;p>This turns out not be so easy. One idea that comes to mind is to first create a schema for the target type ignoring all optional members; then use that schema to actually create an object of the target type. From there, it only remains to check the values of the optional members.&lt;/p>
-&lt;p>But this is not possible since objects can be creating from all kinds of objects (and not just from a dictionary) and restricting that doesn&amp;rsquo;t look like a good idea.&lt;/p>
-&lt;h3 id="complete-nested-models-schemas">Complete nested models schemas???&lt;/h3>
+&lt;p>But this is not possible since objects can be created from all kinds of objects (and not just from a dictionary) and restricting that doesn&amp;rsquo;t look like a good idea.&lt;/p>
+&lt;p>To achieve this effect, we would have to use complex members holding their metadata; such as:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-cpp" data-lang="cpp">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#080;font-weight:bold">class&lt;/span> &lt;span style="color:#b06;font-weight:bold">baseModel&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#080;font-weight:bold">struct&lt;/span> &lt;span style="color:#b06;font-weight:bold">alpha&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#080;font-weight:bold">static&lt;/span> &lt;span style="color:#080;font-weight:bold">constexpr&lt;/span> &lt;span style="color:#339;font-weight:bold">int&lt;/span> min_ &lt;span style="color:#333">=&lt;/span> &lt;span style="color:#00d;font-weight:bold">0&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#080;font-weight:bold">static&lt;/span> &lt;span style="color:#080;font-weight:bold">constexpr&lt;/span> &lt;span style="color:#339;font-weight:bold">int&lt;/span> max_ &lt;span style="color:#333">=&lt;/span> &lt;span style="color:#00d;font-weight:bold">10&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#080;font-weight:bold">static&lt;/span> &lt;span style="color:#080;font-weight:bold">const&lt;/span> &lt;span style="color:#339;font-weight:bold">int&lt;/span> default_ &lt;span style="color:#333">=&lt;/span> &lt;span style="color:#00d;font-weight:bold">1&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#080;font-weight:bold">static&lt;/span> &lt;span style="color:#080;font-weight:bold">constexpr&lt;/span> std&lt;span style="color:#333">::&lt;/span>string_view name_ &lt;span style="color:#333">=&lt;/span> &lt;span style="background-color:#fff0f0">&amp;#34;alpha&amp;#34;&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#080;font-weight:bold">static&lt;/span> &lt;span style="color:#080;font-weight:bold">constexpr&lt;/span> std&lt;span style="color:#333">::&lt;/span>string_view description_ &lt;span style="color:#333">=&lt;/span> &lt;span style="background-color:#fff0f0">&amp;#34;cool description of alpha&amp;#34;&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#339;font-weight:bold">int&lt;/span> v;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> } alpha;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>};
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>We could then use &lt;code>alpha.default&lt;/code> to initialize &lt;code>alpha&lt;/code>; and it is accessible through the reflection system. Since it&amp;rsquo;s a &lt;code>constexpr&lt;/code>; this adds no runtime costs. The thing is, the default value for non-linear types will need to be initialized out-of-line. Using the reflection system for default values is possible for literal types only since non-literals cannot generally be &lt;code>constexpr&lt;/code> (at the moment, there is no support for &lt;code>constexpr std::vector&lt;/code> in any compiler!).&lt;/p>
+&lt;h3 id="complete-nested-model-schemas">Complete nested model schemas???&lt;/h3>
 &lt;p>If we look closely at the generated schema from the previous example:&lt;/p>
 &lt;pre tabindex="0">&lt;code>{
 baseModelType childModel;
@@ -446,8 +459,8 @@ key &amp;#34;__optional Foam::word here__&amp;#34;;
 m 0;
 vv ( 0 0 0 );
 }
-&lt;/code>&lt;/pre>&lt;p>we can see that the &lt;code>subModel&lt;/code> shows only members of the base class. To make it show the full array of members of the concrete type, the user can prompted to pick a valid model, and then &lt;code>baseModel::schema(&amp;quot;pickedModel&amp;quot;)&lt;/code> will be called inside &lt;code>builder::schema&amp;lt;baseModel&amp;gt;()&lt;/code> instead of calling &lt;code>builder::schema&amp;lt;memberBaseType&amp;gt;()&lt;/code>. This scenario is particularly in building GUIs.&lt;/p>
+&lt;/code>&lt;/pre>&lt;p>we can see that the &lt;code>subModel&lt;/code> shows only members of the base class. To make it show the full array of members of the concrete type, the user can be prompted to pick a valid model, and then &lt;code>baseModel::schema(&amp;quot;pickedModel&amp;quot;)&lt;/code> will be called inside &lt;code>builder::schema&amp;lt;baseModel&amp;gt;()&lt;/code> instead of calling &lt;code>builder::schema&amp;lt;memberBaseType&amp;gt;()&lt;/code>. This scenario is particularly useful in building GUIs.&lt;/p>
 &lt;h2 id="conclusion">Conclusion&lt;/h2>
-&lt;p>At this points, all of the design goals mentioned back in &lt;a href="https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/09/29/a-reflection-system-for-meshfreefoam-part-1/">Part 1&lt;/a> have been achieved. Except for minor changes, I will not develop the system any further.&lt;/p>
+&lt;p>At this point, all of the design goals mentioned back in &lt;a href="https://foamscience.github.io/MeshFreeFoam-Docs/blog/2023/09/29/a-reflection-system-for-meshfreefoam-part-1/">Part 1&lt;/a> have been achieved. Except for minor changes, I will not develop the system any further.&lt;/p>
 &lt;p>Use cases are exclusively &lt;strong>(automatically) generating schemas for OpenFOAM classes&lt;/strong> and &lt;strong>(again automatically) building GUI widgets for target types&lt;/strong>&lt;/p>
 &lt;p>You can find the final product with a sample application to iteratively generate a dictionary for some basic models at &lt;a href="https://github.com/FoamScience/openfoam-reflections">FoamScience/openfoam-reflections&lt;/a>.&lt;/p></description></item></channel></rss>
