@@ -7,32 +7,33 @@
 &lt;/ol>
 &lt;p>This practically applies to any library that is hard to merge my changes into and gets frequent updates.&lt;/p>
 &lt;h2 id="dependency-management-workflow">Dependency management workflow&lt;/h2>
-&lt;p>The workflow to manage my dependencies revolves around the following concepts:&lt;/p>
+&lt;p>The workflow to manage my dependencies revolves around the following concepts and ideas:&lt;/p>
 &lt;ul>
-&lt;li>Have a central repository for all dependencies in case I change stuff in their code.&lt;/li>
-&lt;li>Include that repo as a submodule/subtree in the main project.&lt;/li>
-&lt;li>Customizing the dependency code should be as streamlined as possible, without losing the ability to pull changes from upstream repos.&lt;/li>
+&lt;li>I need a way to significantly customize OpenFOAM libs while keeping the ability to pull updates from upstream repo.&lt;/li>
+&lt;li>Keep the full git history for each file I use from the upstream repo.&lt;/li>
+&lt;li>Switching dependency libs should be easy. A few conflicts are fine, but no significant code refactoring should be necessary.&lt;/li>
 &lt;/ul>
 &lt;h3 id="how-to-make-openfoam-libs-available-as-dependencies">How to make OpenFOAM libs available as dependencies&lt;/h3>
 &lt;p>There are scripts to automatize this process, but I will explain the most important steps here:&lt;/p>
-&lt;p>We start by cloning the project, filtering the paths we need, then tagging the state as &lt;code>original&lt;/code> (You&amp;rsquo;ll need &lt;a href="https://github.com/newren/git-filter-repo/">git-filter-repo&lt;/a> for this).&lt;/p>
+&lt;p>We start by cloning the OpenFOAM project, filtering the paths we need (You&amp;rsquo;ll need &lt;a href="https://github.com/newren/git-filter-repo/">git-filter-repo&lt;/a> for this).&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>git clone https://develop.openfoam.com/Development/openfoam /tmp/openfoam-scratch
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#007020">cd&lt;/span> /tmp/openfoam-scratch
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git filter-repo --path COPYING --path Allwmake --path bin --path etc --path src/Allwmake &lt;span style="color:#666;background-color:#fff0f0;font-weight:bold">\
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#666;background-color:#fff0f0;font-weight:bold">&lt;/span> --path src/OSspecific --path src/OpenFOAM --path src/Pstream/ &lt;span style="color:#666;background-color:#fff0f0;font-weight:bold">\
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#666;background-color:#fff0f0;font-weight:bold">&lt;/span> --path META-INFO/ --path wmake --force
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Next, in the dependencies repo, add this as a subtree, and make a branch for &lt;code>original&lt;/code> OpenFOAM commits:&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Next, in the target project repo, add the mutilated OpenFOAM repository as a subtree, and make a branch for &lt;code>original&lt;/code> OpenFOAM commits there:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#007020">cd&lt;/span> /path/to/repo/root
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git subtree add --prefix dependencies/meshfree-openfoam /tmp/openfoam-scratch/ master
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git checkout -b original-openfoam
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Switch back to master, and commit the custom changes we need:&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Switch back to master (or whatever your main branch is called), do some changes, and commit:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>git checkout master
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git add -A
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git commit -m &lt;span style="background-color:#fff0f0">&amp;#34;Update OpenFOAM compilation&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Updates from the original repo come in two forms:&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>The changes you make will obviously be related to your target project, so it&amp;rsquo;s a good idea to keep those commits in your main repository instead of managing a zillion dependency repositories.&lt;/p>
+&lt;p>Updates from the original repo come in two forms:&lt;/p>
 &lt;ul>
-&lt;li>New change commits. These may cause conflicts with our changes, so rebasing will allow us to solve them.&lt;/li>
-&lt;li>New libraries we want to add. These are also new commits, but we know they won&amp;rsquo;t cause trouble since they only add files to &lt;code>original&lt;/code>. We only have to remember to update &lt;code>Allwmake&lt;/code> scripts to compile those new libraries.&lt;/li>
+&lt;li>New change commits. These may cause conflicts with our changes, so rebasing will allow us to solve them if done frequently enough.&lt;/li>
+&lt;li>New libraries we want to add. These are also new commits, but we know they won&amp;rsquo;t cause trouble since they only add files to &lt;code>original&lt;/code> branch. We only have to remember to update &lt;code>Allwmake&lt;/code> scripts to compile those new libraries.&lt;/li>
 &lt;/ul>
 &lt;p>Here is how to add &lt;code>src/fileFormats&lt;/code> and &lt;code>src/surfMesh&lt;/code> libraries from OpenFOAM:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#888"># Create a new filtered repo with the new libs&lt;/span>
